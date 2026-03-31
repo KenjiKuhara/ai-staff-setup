@@ -2,7 +2,7 @@
 # AI社員セットアップスクリプト
 # 『AI社員の育て方』付録
 #
-# 使い方: VS Code のターミナルで以下を実行
+# 使い方: PowerShell で以下を実行
 #   iex(irm 'https://raw.githubusercontent.com/KenjiKuhara/ai-staff-setup/main/setup.ps1')
 # ============================================================
 
@@ -41,12 +41,56 @@ Write-Host "" -ForegroundColor Cyan
 Write-Host "========================================" -ForegroundColor Cyan
 Write-Host ""
 
-$totalSteps = 3
+# --- winget チェック（全ステップの前提） ---
+$wingetCmd = Get-Command winget -ErrorAction SilentlyContinue
+if (-not $wingetCmd) {
+    Write-Err "winget が見つかりません。"
+    Write-Err "Microsoft Store で「アプリ インストーラー」を更新してから再実行してください。"
+    return
+}
+
+$totalSteps = 4
 
 # ============================================================
-# Step 1: Node.js
+# Step 1: VS Code
 # ============================================================
-Write-Step 1 $totalSteps "Node.js を確認しています..."
+Write-Step 1 $totalSteps "VS Code を確認しています..."
+
+$codeCmd = Get-Command code -ErrorAction SilentlyContinue
+
+if (-not $codeCmd) {
+    Write-Info "VS Code が見つかりません。インストールします..."
+    Write-Info "(管理者権限の確認画面が出たら「はい」を押してください)"
+    Write-Host ""
+
+    winget install Microsoft.VisualStudioCode --accept-package-agreements --accept-source-agreements
+
+    if ($LASTEXITCODE -ne 0) {
+        Write-Err "VS Code のインストールに失敗しました。"
+        Write-Err "手動でインストールしてください: https://code.visualstudio.com/"
+        return
+    }
+
+    Refresh-PathFromRegistry
+
+    $codeCmd = Get-Command code -ErrorAction SilentlyContinue
+    if (-not $codeCmd) {
+        Write-Err "VS Code をインストールしましたが、PATH に反映されませんでした。"
+        Write-Err "ターミナルを閉じて開き直し、もう一度このコマンドを実行してください。"
+        return
+    }
+
+    $v = & code --version 2>$null | Select-Object -First 1
+    Write-Ok "VS Code $v をインストールしました。"
+} else {
+    $v = & code --version 2>$null | Select-Object -First 1
+    Write-Ok "VS Code $v ... OK"
+}
+
+# ============================================================
+# Step 2: Node.js
+# ============================================================
+Write-Step 2 $totalSteps "Node.js を確認しています..."
 
 $nodeCmd = Get-Command node -ErrorAction SilentlyContinue
 
@@ -54,13 +98,6 @@ if (-not $nodeCmd) {
     Write-Info "Node.js が見つかりません。インストールします..."
     Write-Info "(管理者権限の確認画面が出たら「はい」を押してください)"
     Write-Host ""
-
-    $wingetCmd = Get-Command winget -ErrorAction SilentlyContinue
-    if (-not $wingetCmd) {
-        Write-Err "winget が見つかりません。"
-        Write-Err "Microsoft Store で「アプリ インストーラー」を更新してから再実行してください。"
-        return
-    }
 
     winget install OpenJS.NodeJS.LTS --accept-package-agreements --accept-source-agreements
 
@@ -87,9 +124,9 @@ if (-not $nodeCmd) {
 }
 
 # ============================================================
-# Step 2: Claude Code
+# Step 3: Claude Code
 # ============================================================
-Write-Step 2 $totalSteps "Claude Code を確認しています..."
+Write-Step 3 $totalSteps "Claude Code を確認しています..."
 
 $claudeCmd = Get-Command claude -ErrorAction SilentlyContinue
 
@@ -116,9 +153,9 @@ if (-not $claudeCmd) {
 }
 
 # ============================================================
-# Step 3: AI社員の初期ファイルを作成
+# Step 4: AI社員の初期ファイルを作成
 # ============================================================
-Write-Step 3 $totalSteps "AI社員の初期ファイルを作成しています..."
+Write-Step 4 $totalSteps "AI社員の初期ファイルを作成しています..."
 
 # --- フォルダ作成 ---
 $dirs = @(
@@ -237,10 +274,16 @@ Write-Host "========================================" -ForegroundColor Green
 Write-Host ""
 Write-Host "  次のステップ:" -ForegroundColor White
 Write-Host ""
-Write-Host "    1. claude と入力して Enter" -ForegroundColor White
-Write-Host "       (初回はログイン画面が表示されます)" -ForegroundColor Gray
+Write-Host "    1. VS Code でこのフォルダーを開く" -ForegroundColor White
+Write-Host "       (メニュー「ファイル」→「フォルダーを開く」)" -ForegroundColor Gray
 Write-Host ""
-Write-Host "    2. company と入力して Enter" -ForegroundColor White
+Write-Host "    2. メニュー「ターミナル」→「新しいターミナル」を開く" -ForegroundColor White
+Write-Host ""
+Write-Host "    3. claude と入力して Enter" -ForegroundColor White
+Write-Host "       (初回はログイン画面が表示されます。" -ForegroundColor Gray
+Write-Host "        事前準備で作成したAnthropicアカウントでログインしてください)" -ForegroundColor Gray
+Write-Host ""
+Write-Host "    4. company と入力して Enter" -ForegroundColor White
 Write-Host "       (秘書が起動します)" -ForegroundColor Gray
 Write-Host ""
 Write-Host "  秘書が立ち上がったら、何でも相談してください。" -ForegroundColor Cyan

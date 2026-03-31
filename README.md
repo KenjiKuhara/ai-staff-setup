@@ -4,76 +4,70 @@
 
 コマンド1つで、あなたのパソコンにAI社員（AI秘書）を立ち上げます。
 
+## はじめての方へ
+
+パソコンに詳しくない方は、まず **[事前準備ガイド](docs/preparation.md)** をお読みください。
+アカウントの作り方から、画面の開き方まで、1つずつ説明しています。
+
 ## 必要なもの
 
 - Windows 11
-- VS Code
-- Anthropic アカウント（[claude.ai](https://claude.ai) で作成できます）
+- インターネット接続
+- Anthropic アカウント（[作成方法はこちら](docs/preparation.md#step-1-anthropic-アカウントを作成する)）
+
+VS Code や Node.js は、インストールされていなければスクリプトが自動でインストールします。
 
 ## 使い方
 
-### 1. セットアップ
+### 1. PowerShell を開く
 
-VS Code でフォルダーを開き、ターミナルに以下を貼り付けて Enter を押してください。
+キーボードの Windows キーを押して `powershell` と入力し、「Windows PowerShell」を開きます。
+
+### 2. 作業フォルダーを作る
+
+```powershell
+mkdir $HOME\ai-staff
+cd $HOME\ai-staff
+```
+
+### 3. セットアップを実行する
 
 ```powershell
 iex(irm 'https://raw.githubusercontent.com/KenjiKuhara/ai-staff-setup/main/setup.ps1')
 ```
 
-以下が自動で行われます:
+以下が自動でインストール/作成されます（既にあるものはスキップ）:
 
-- Node.js のインストール（未インストールの場合）
-- Claude Code のインストール（未インストールの場合）
-- AI社員の初期ファイル作成（CLAUDE.md、秘書室フォルダー）
+- VS Code
+- Node.js
+- Claude Code
+- AI社員の初期ファイル（CLAUDE.md、秘書室フォルダー）
 
-### 2. 秘書を起動する
+### 4. AI社員を起動する
 
-セットアップ完了後、同じターミナルで:
+セットアップ完了後、VS Code でフォルダーを開き、ターミナルで:
 
 ```
 claude
 ```
 
-初回はログイン画面が表示されます。画面の案内に従ってログインしてください。
-
-ログイン後:
+初回はAnthropicアカウントでログインしてください。ログイン後:
 
 ```
 company
 ```
 
-秘書が挨拶をしたら、セットアップ完了です。
-
-## セットアップ後にできること
-
-- 秘書があなたの仕事をヒアリングし、AIに任せられる業務を一緒に見つけます
-- 業務棚卸しリストが自動で育っていきます
-- 慣れてきたら CLAUDE.md を書き換えて、自分好みの秘書に育てられます
-
-## 作成されるファイル
-
-```
-CLAUDE.md                <- AI社員の設計図
-.company/
-  secretary/
-    inbox/               <- メモやアイデアを放り込む場所
-  reviews/               <- 品質チェックのログ
-  .trash/                <- 削除の代わりにここに移動
-```
+秘書が挨拶をしたら完了です。
 
 ## トラブルシューティング
 
-### 「winget が見つかりません」と表示される
+詳しくは [事前準備ガイド](docs/preparation.md) をご覧ください。
 
-Microsoft Store で「アプリ インストーラー」を更新してください。
-
-### 「PATH に反映されませんでした」と表示される
-
-ターミナルを閉じて開き直し、もう一度セットアップコマンドを実行してください。
-
-### Claude Code のログインがうまくいかない
-
-[Claude Code 公式ドキュメント](https://docs.anthropic.com/en/docs/claude-code)を参照してください。
+| 症状 | 対処 |
+|------|------|
+| winget が見つかりません | Microsoft Store で「アプリ インストーラー」を更新 |
+| PATH に反映されませんでした | ターミナルを閉じて開き直し、再実行 |
+| ログインできない | [Claude Code 公式ドキュメント](https://docs.anthropic.com/en/docs/claude-code)を参照 |
 
 ## 書籍について
 
